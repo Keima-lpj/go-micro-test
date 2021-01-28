@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto;
+
+message GetRequest {
+    int32 user_id = 1;
+}
+
+message PutResponse {
+    string name = 1;
+    int32 age = 2;
+    int32 score = 3;
+}
+
+service UserServer {
+    rpc UserInfo(GetRequest) returns(PutResponse){}
+}
