@@ -43,6 +43,7 @@ func NewUserServerEndpoints() []*api.Endpoint {
 
 type UserServerService interface {
 	UserInfo(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*PutResponse, error)
+	UserInfoFromServer2(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*PutResponse, error)
 }
 
 type userServerService struct {
@@ -67,15 +68,27 @@ func (c *userServerService) UserInfo(ctx context.Context, in *GetRequest, opts .
 	return out, nil
 }
 
+func (c *userServerService) UserInfoFromServer2(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*PutResponse, error) {
+	req := c.c.NewRequest(c.name, "UserServer.UserInfoFromServer2", in)
+	out := new(PutResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for UserServer service
 
 type UserServerHandler interface {
 	UserInfo(context.Context, *GetRequest, *PutResponse) error
+	UserInfoFromServer2(context.Context, *GetRequest, *PutResponse) error
 }
 
 func RegisterUserServerHandler(s server.Server, hdlr UserServerHandler, opts ...server.HandlerOption) error {
 	type userServer interface {
 		UserInfo(ctx context.Context, in *GetRequest, out *PutResponse) error
+		UserInfoFromServer2(ctx context.Context, in *GetRequest, out *PutResponse) error
 	}
 	type UserServer struct {
 		userServer
@@ -90,4 +103,8 @@ type userServerHandler struct {
 
 func (h *userServerHandler) UserInfo(ctx context.Context, in *GetRequest, out *PutResponse) error {
 	return h.UserServerHandler.UserInfo(ctx, in, out)
+}
+
+func (h *userServerHandler) UserInfoFromServer2(ctx context.Context, in *GetRequest, out *PutResponse) error {
+	return h.UserServerHandler.UserInfoFromServer2(ctx, in, out)
 }
